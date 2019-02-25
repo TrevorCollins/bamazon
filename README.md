@@ -12,6 +12,8 @@ Once you've navigated to the bamazon directory in your terminal and installed th
 
 You'll first see all of the items currently in the store. You can then choose the item and quantity you wish to buy. If there isn't enough stock, you'll be asked if you want to buy less. Otherwise, your order will go through, the inventory will be updated, and you'll be asked what you want to do next. You can either view the store, buy another item, or exit the app.
 
+![Bamazon Customer](./images/customer.png)
+
 ##### Manager Side
 
 You will be presented with a list of options.
@@ -27,6 +29,8 @@ You will be presented with a list of options.
 
 * Add New Product
   You will give a name, price, department, and quantity of an item you wish to add to the database.
+  
+![Bamazon Manager](./images/manager.png)
 
 ## NPMs Used
 
