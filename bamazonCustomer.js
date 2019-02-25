@@ -18,20 +18,9 @@ connection.connect(function (err) {
 });
 
 function start() {
+    viewStore();
+
     connection.query("SELECT * FROM products", function (err, res) {
-        console.log("**************************************************************");
-        console.log(" ");
-        for (var i = 0; i < res.length; i++) {
-            var id = res[i].item_id;
-            var name = res[i].product_name;
-            var price = res[i].price;
-
-            console.log(id + ": " + name + " -- $" + price);
-            console.log(" ");
-        };
-        console.log("**************************************************************");
-        console.log("");
-
         inquirer.prompt([
             {
                 name: "item",
@@ -70,20 +59,54 @@ function start() {
     });
 };
 
+function viewStore() {
+    connection.query("SELECT * FROM products", function (err, res) {
+        console.log("**************************************************************");
+        console.log(" ");
+        for (var i = 0; i < res.length; i++) {
+            var id = res[i].item_id;
+            var name = res[i].product_name;
+            var price = res[i].price;
+
+            console.log(id + ": " + name + " -- $" + price);
+            console.log(" ");
+        };
+        console.log("**************************************************************");
+        console.log("");
+    });
+};
+
+function nextStep() {
+    inquirer.prompt({
+        name: "action",
+        type: "list",
+        message: "What would you like to do next?",
+        choices: ["View Store", "Buy Something Else", "Exit"]
+    }).then(function (answer) {
+        if (answer.action === "View Store") {
+            viewStore();
+            nextStep();
+        } else if (answer.action === "Buy Something Else") {
+            start();
+        } else {
+            connection.end();
+        }
+    })
+}
+
 function update(product, quantity) {
     connection.query("UPDATE products SET ? WHERE ?",
-    [
-        {
-            stock_quantity: product.stock_quantity - quantity
-        }, {
-            item_id: product.item_id
-        }
-    ], function(error) {
-        if (error) throw err;
-        console.log("There are now " + product.stock_quantity + " left!");
-        console.log("Your cost is $" + (product.price * quantity));
-        start();
-      });
+        [
+            {
+                stock_quantity: product.stock_quantity - quantity
+            }, {
+                item_id: product.item_id
+            }
+        ], function (error) {
+            if (error) throw err;
+            console.log("Your cost is $" + (product.price * quantity));
+            nextStep();
+        });
 };
 
 function notEnough(item) {
@@ -107,11 +130,11 @@ function notEnough(item) {
                     }
                     return false;
                 }
-            }).then(function(answer) {
+            }).then(function (answer) {
                 var quantity = parseInt(answer.quantity);
                 console.log(product.stock_quantity);
 
-                if(quantity > product.stock_quantity) {
+                if (quantity > product.stock_quantity) {
                     console.log("We still don't have enough!");
                     notEnough();
                 } else {
